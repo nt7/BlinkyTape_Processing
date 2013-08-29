@@ -167,31 +167,6 @@ void draw()
   if ( beat.isSnare() ) snareSize = min(32, snareSize+1.5);
   if ( beat.isHat() ) hatSize = 32;
 
-//  if ( hatSize == 32) {
-//    col = col + 3.14159*.05;
-//  }
-//  for (int i = 0; i < numberOfLEDs/4 + 1; i++) {
-//    float bright = (kickSize*2 - numberOfLEDs/2 - i)/8;
-//    stroke(color((sin(col + i*.05              )+1)*128, 
-//    (sin(col + i*.05 + 3.14159*2/3)+1)*128, 
-//    (sin(col + i*.05 + 3.14159*4/3)+1)*128, 
-//    bright*255
-//      ));
-//    point(0, numberOfLEDs/4+i);
-//    point(0, numberOfLEDs/4-i);
-//
-//
-//
-//    bright = (snareSize*2 - numberOfLEDs/2 - i)/8;
-//    stroke(color((sin(col + i*.05 + 3.14159*2/3)+1)*128, 
-//    (sin(col + i*.05 + 3.14159*4/3)+1)*128, 
-//    (sin(col + i*.05              )+1)*128, 
-//    bright*255
-//      ));
-//    point(0, numberOfLEDs*3/4+i);
-//    point(0, numberOfLEDs*3/4-i);
-//  }
-
   if ( beat.isKick() ) {
     for(Pulser p : rightPulsers) {
       for(int i = 0; i < random(0,3); i++) {
