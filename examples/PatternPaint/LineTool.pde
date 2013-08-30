@@ -49,6 +49,7 @@ class LineTool {
       toolBuff.background(img);
       toolBuff.strokeWeight(size);
       toolBuff.stroke(cp.c);
+      toolBuff.noSmooth();
       toolBuff.line(startX, startY, endX, endY);
       toolBuff.endDraw();
     }

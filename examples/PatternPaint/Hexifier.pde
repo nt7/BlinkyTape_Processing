@@ -1,3 +1,5 @@
+import java.io.StringWriter;
+
 // We want to make some hex data!
 
 

@@ -1,5 +1,6 @@
 import processing.serial.*;
 import controlP5.*;
+import java.awt.event.KeyEvent;
 //import processing.opengl.*;
 //import javax.media.opengl.GL;
 
@@ -15,11 +16,14 @@ int buffOffX = 120;
 int buffOffY = 10;
 int buffScale = 6;
 
+int numberOfLEDs = 60;
+int columns = 60;
+
 LineTool tool;
 
 void setup() {
-  buffer = createGraphics(60, 60, JAVA2D);
-  size(windowWidthForBuffer(buffer), 380, JAVA2D);
+  buffer = createGraphics(numberOfLEDs, columns);
+  size(windowWidthForBuffer(buffer), 380);
 
 //  noSmooth();
 //  // Turn on vsync to prevent tearing
@@ -42,10 +46,10 @@ void setup() {
                       buffScale * buffer.height);
                       
   for(String p : Serial.list()) {
-//    if(p.startsWith("/dev/cu.usbmodem")) {
-//      led = new LedOutput(this, p, 60);
-//      break;  // TODO: does this work?
-//    }
+    if(p.startsWith("/dev/cu.usbmodem")) {
+      led = new LedOutput(this, p, numberOfLEDs);
+      break;  // TODO: does this work?
+    }
   }
 
   controlP5 = new ControlP5(this);
@@ -236,7 +240,7 @@ float screenToBuffY(float screenY) {
 }
 
 void savePattern() {
-  LedSaver saver = new LedSaver("pov", 60);
+  LedSaver saver = new LedSaver("pov", numberOfLEDs);
   for (int x = 0; x < buffer.width; x++) {
     saver.addFrame(buffer, x, 0, x, buffer.height);
   }
@@ -253,9 +257,13 @@ void launchProcess() {
 }
 
 void importImage() {
-  String imgPath = selectInput("Select an imagefile to import");
-  if (imgPath != null) {
-    PImage img = loadImage(imgPath);
+  // TODO: Fix this
+  selectInput("Select an imagefile to import", "ImportImageSelected");
+}
+
+void ImportImageSelected(File selection) {
+  if (selection != null) {
+    PImage img = loadImage(selection.getAbsolutePath());
     // create a new buffer to fit this image
     buffer = createGraphics(img.width, img.height, JAVA2D);
     buffer.beginDraw();
@@ -273,11 +281,16 @@ void importImage() {
 }
 
 void saveAsImage() {
-  String imgPath = selectOutput("Save PNG file");
-  if(imgPath != null) {
+  selectOutput("Save PNG file", "SaveAsImageSelected");
+}
+
+void SaveAsImageSelected(File selection) {
+  if(selection != null) {
     PImage img = buffer.get(0, 0, buffer.width, buffer.height);
-    img.save(imgPath);
-    println("Saved PNG file to '" + imgPath + "'.");
+    
+    // TODO: Force .png ending here!
+    img.save(selection.getAbsolutePath());
+    println("Saved PNG file to '" + selection.getAbsolutePath());
   }
 }
 
