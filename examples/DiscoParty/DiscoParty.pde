@@ -29,7 +29,7 @@ FFT rightFft;
 BeatDetect beat;
 BeatListener bl;
 
-float globalVolume = 1;  // amplification value
+float globalVolume = 10;  // amplification value
 float globalFalloff = 1;  // how fast things die off
 float globalSat = 100;
 
@@ -66,12 +66,6 @@ void setup()
     }
   }
 
-//  leds.add(new LedOutput(this, "/dev/cu.usbmodemfa131", numberOfLEDs));
-//  leds.add(new LedOutput(this, "/dev/cu.usbmodemfd1241", numberOfLEDs));
-//  leds.add(new LedOutput(this, "/dev/cu.usbmodemfd1231", numberOfLEDs));
-  
-  //  song = minim.loadFile("Fog.mp3", 2048);
-  //  song.play();
   // a beat detection object that is FREQ_ENERGY mode that 
   // expects buffers the length of song's buffer size
   // and samples captured at songs's sample rate
@@ -166,6 +160,31 @@ void draw()
   if ( beat.isKick() ) kickSize = min(32, kickSize+1.5);
   if ( beat.isSnare() ) snareSize = min(32, snareSize+1.5);
   if ( beat.isHat() ) hatSize = 32;
+
+//  if ( hatSize == 32) {
+//    col = col + 3.14159*.05;
+//  }
+//  for (int i = 0; i < numberOfLEDs/4 + 1; i++) {
+//    float bright = (kickSize*2 - numberOfLEDs/2 - i)/8;
+//    stroke(color((sin(col + i*.05              )+1)*128, 
+//    (sin(col + i*.05 + 3.14159*2/3)+1)*128, 
+//    (sin(col + i*.05 + 3.14159*4/3)+1)*128, 
+//    bright*255
+//      ));
+//    point(0, numberOfLEDs/4+i);
+//    point(0, numberOfLEDs/4-i);
+//
+//
+//
+//    bright = (snareSize*2 - numberOfLEDs/2 - i)/8;
+//    stroke(color((sin(col + i*.05 + 3.14159*2/3)+1)*128, 
+//    (sin(col + i*.05 + 3.14159*4/3)+1)*128, 
+//    (sin(col + i*.05              )+1)*128, 
+//    bright*255
+//      ));
+//    point(0, numberOfLEDs*3/4+i);
+//    point(0, numberOfLEDs*3/4-i);
+//  }
 
   if ( beat.isKick() ) {
     for(Pulser p : rightPulsers) {

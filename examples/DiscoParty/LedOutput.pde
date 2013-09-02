@@ -6,17 +6,17 @@ class LedOutput
   private Serial m_outPort;
 
   private int m_numberOfLEDs;
-  private Boolean m_gammaCorrection;
+  private Boolean m_enableGammaCorrection;
   private float m_gammaValue;
 
   LedOutput(PApplet parent, String portName, int numberOfLEDs) {
     m_portName = portName;
     m_numberOfLEDs = numberOfLEDs;
     
-    m_gammaCorrection = true;
-    m_gammaValue = .85;
+    m_enableGammaCorrection = true;
+    m_gammaValue = 1.8;
 
-    println("Connecting to BlinkyBoard on: " + portName);
+    println("Connecting to BlinkyTape on: " + portName);
     m_outPort = new Serial(parent, portName, 115200);
   }
   
@@ -42,7 +42,7 @@ class LedOutput
       int g = int(green(image.pixels[y*width+x]));
       int b = int(blue(image.pixels[y*width+x]));
       
-      if (m_gammaCorrection) {
+      if (m_enableGammaCorrection) {
         r = (int)(Math.pow(r/256.0,m_gammaValue)*256);
         g = (int)(Math.pow(g/256.0,m_gammaValue)*256);
         b = (int)(Math.pow(b/256.0,m_gammaValue)*256);
@@ -53,7 +53,7 @@ class LedOutput
       data[dataIndex++] = (byte)min(254, b);
     }
     
-// For WS2811
+    // Add a 0xFF at the end, to signal the tape to display
     data[dataIndex++] = (byte)255;
     
     // Don't send data too fast, the arduino can't handle it.
