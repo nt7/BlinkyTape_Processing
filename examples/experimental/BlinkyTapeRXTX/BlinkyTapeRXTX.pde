@@ -1,7 +1,5 @@
-// This is an attempt to replace the RXTX/Processing Serial library with the
-// java simple serial controller library:
-// https://github.com/scream3r/java-simple-serial-connector
-
+// This is an attempt to replace the RXTX/Processing Serial library with a
+// straight implementation of the RXTX library.
 
 int numberOfLEDs = 60;
 ArrayList<LedOutput> leds = new ArrayList<LedOutput>();
@@ -11,15 +9,17 @@ void setup() {
 
   // auto connect to all blinkyboards
   for (String p : listPorts()) {
-    if (p.startsWith("/dev/tty.usbmodem")) {
-      LedOutput output = new LedOutput(this, p, numberOfLEDs);
-      //output.start();
-      leds.add(output);
+    if (p.startsWith("/dev/cu.usbmodem")) {
+      println("Connecting to port " + p);
+      leds.add(new LedOutput(this, p, numberOfLEDs));
     }
   }
   println("done setting up");
-  delay(2000);
 }
+
+
+int frame = 0;
+float frameRateSum = 0;
 
 float phase = 0;
 void draw() {
@@ -42,5 +42,14 @@ void draw() {
   for (int i = 0; i < leds.size(); i++) {
     leds.get(i).sendUpdate(i, height-1, i, 0);
   }
+  
+  
+  frame = (frame + 1)%30;
+  if(frame == 0) {
+    println(frameRateSum/30);
+    frameRateSum = 0;
+  }
+  frameRateSum += frameRate;
 }
+
 

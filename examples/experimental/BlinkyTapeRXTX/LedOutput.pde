@@ -1,55 +1,28 @@
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ArrayBlockingQueue;
+// TODO: Make this threaded! We can't hit high framerates otherwise :-(
 
-class ThreadedLedOutput extends Thread
+class LedOutput
 {
   private String m_portName;  // TODO: How to request cu.* devices?
-  private JsscSerial m_outPort;
+  private DirectSerial m_outPort;
 
   private int m_numberOfLEDs;
   private Boolean m_enableGammaCorrection;
   private float m_gammaValue;
-  
-  BlockingQueue outputQueue;
 
-  ThreadedLedOutput(PApplet parent, String portName, int numberOfLEDs) {
+  LedOutput(PApplet parent, String portName, int numberOfLEDs) {
     m_portName = portName;
     m_numberOfLEDs = numberOfLEDs;
     
     m_enableGammaCorrection = true;
     m_gammaValue = 1.8;
-    
-    outputQueue = new ArrayBlockingQueue(2);
-    
-    //?
-    println("Connecting to BlinkyTape on: " + m_portName);
-    m_outPort = new JsscSerial(m_portName);
-  }
-  
-  void run() {
 
-    
-    while(true) {
-      if (outputQueue.size() > 0) {
-        byte[] data = (byte[])outputQueue.remove();
-        sendFrame(data);
-      }
-    }
+    println("Connecting to BlinkyTape on: " + portName);
+    m_outPort = new DirectSerial();
+    m_outPort.connect(portName);
   }
   
-  private void sendFrame(byte[] data) {
-    // Don't send data too fast, the arduino can't handle it.
-    int maxChunkSize = 5;
-    for(int currentChunkPos = 0; currentChunkPos < m_numberOfLEDs*3 + 1; currentChunkPos += maxChunkSize) {
-      int currentChunkSize = min(maxChunkSize, m_numberOfLEDs*3 + 1 - currentChunkPos);
-      byte[] test = new byte[currentChunkSize];
-      
-      for(int i = 0; i < currentChunkSize; i++) {
-          test[i] = data[currentChunkPos + i];
-      }
-    
-      m_outPort.write(test);
-    }
+  String getName() {
+    return m_portName;
   }
   
   void sendUpdate(float x1, float y1, float x2, float y2) {
@@ -88,14 +61,17 @@ class ThreadedLedOutput extends Thread
     // Add a 0xFF at the end, to signal the tape to display
     data[dataIndex++] = (byte)255;
     
-    if(outputQueue.size() < 1) {
-      try {
-        outputQueue.put(data);
+    // Don't send data too fast, the arduino can't handle it.
+    int maxChunkSize = 5;
+    for(int currentChunkPos = 0; currentChunkPos < m_numberOfLEDs*3 + 1; currentChunkPos += maxChunkSize) {
+      int currentChunkSize = min(maxChunkSize, m_numberOfLEDs*3 + 1 - currentChunkPos);
+      byte[] test = new byte[currentChunkSize];
+      
+      for(int i = 0; i < currentChunkSize; i++) {
+          test[i] = data[currentChunkPos + i];
       }
-      catch( InterruptedException e ) {
-        // TODO: what to do here?
-        println("Interrupted Exception caught");
-      }
+    
+      m_outPort.write(test);
     }
   }
 }
