@@ -43,13 +43,13 @@ void draw() {
     leds.get(i).sendUpdate(i, height-1, i, 0);
   }
   
-  
-  frame = (frame + 1)%30;
-  if(frame == 0) {
+  frame += 1;
+  frameRateSum += frameRate;  
+  if(frame == 30) {
     println(frameRateSum/30);
     frameRateSum = 0;
+    frame = 0;
   }
-  frameRateSum += frameRate;
 }
 
 
