@@ -251,9 +251,13 @@ void savePattern() {
 
 void launchProcess() {
   savePattern();
-  ProcessLauncher p = new ProcessLauncher(sketchPath("program.sh") + " " + "/dev/cu.usbmodemfa131");
+  led.resetTape();
+  ProcessLauncher p = new ProcessLauncher(sketchPath("program.sh") + " " + led.getPortName());
   delay(100);
   print(p.read());
+  p.waitFor();
+  delay(2000);
+  led = new LedOutput(this, led.getPortName(), numberOfLEDs);
 }
 
 void importImage() {

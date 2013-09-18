@@ -133,5 +133,15 @@ class ProcessLauncher {
   String read() {
     return (String) outputQueue.poll();
   }
+
+  int waitFor() {
+    try {
+      return shell.waitFor();
+    }
+    catch( InterruptedException e) {
+      println("Interrupted Exception caught");
+    }
+    return 0;
+  }
 }
 

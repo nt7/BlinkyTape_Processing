@@ -7,11 +7,14 @@ class LedOutput
 
   private int m_numberOfLEDs;
   
+  private PApplet _parent;
+
   float m_brightness = .6;
   float m_gammaValue = .65;
   boolean m_enableGammaCorrection = true;
 
   LedOutput(PApplet parent, String portName, int numberOfLEDs) {
+    _parent = parent;
     m_portName = portName;
     m_numberOfLEDs = numberOfLEDs;
 
@@ -19,6 +22,17 @@ class LedOutput
     m_outPort = new Serial(parent, portName, 115200);
   }
   
+  String getPortName() {
+    return m_portName;
+  }
+
+  void resetTape() {
+    m_outPort.stop();
+    Serial s = new Serial(_parent, m_portName, 1200);  // Magic reset baudrate
+    delay(100);
+    s.stop();
+  }
+
   void sendUpdate(float x1, float y1, float x2, float y2) {
     sendUpdate(get(), x1, y1, x2, y2);
   }
