@@ -6,17 +6,17 @@ class LedOutput
   private Serial m_outPort;
 
   private int m_numberOfLEDs;
-  private Boolean m_enableGammaCorrection;
+  private Boolean m_gammaCorrection;
   private float m_gammaValue;
 
   LedOutput(PApplet parent, String portName, int numberOfLEDs) {
     m_portName = portName;
     m_numberOfLEDs = numberOfLEDs;
     
-    m_enableGammaCorrection = true;
-    m_gammaValue = 1.8;
+    m_gammaCorrection = true;
+    m_gammaValue = .85;
 
-    println("Connecting to BlinkyTape on: " + portName);
+    println("Connecting to BlinkyBoard on: " + portName);
     m_outPort = new Serial(parent, portName, 115200);
   }
   
@@ -26,8 +26,6 @@ class LedOutput
   
   // Update the blinkyboard with new colors
   void sendUpdate(PImage image, float x1, float y1, float x2, float y2) {
-    m_outPort.clear();
-    
     image.loadPixels();
     
     // Note: this should be sized appropriately
@@ -44,19 +42,29 @@ class LedOutput
       int g = int(green(image.pixels[y*width+x]));
       int b = int(blue(image.pixels[y*width+x]));
       
-      if (m_enableGammaCorrection) {
+      if (m_gammaCorrection) {
         r = (int)(Math.pow(r/256.0,m_gammaValue)*256);
         g = (int)(Math.pow(g/256.0,m_gammaValue)*256);
         b = (int)(Math.pow(b/256.0,m_gammaValue)*256);
       }
 
+// For WS2811
       data[dataIndex++] = (byte)min(254, r);
       data[dataIndex++] = (byte)min(254, g);
       data[dataIndex++] = (byte)min(254, b);
+
+// For LPD8806
+//      data[dataIndex++] = (byte)(0x80 + (g >> 1));
+//      data[dataIndex++] = (byte)(0x80 + (r >> 1));
+//      data[dataIndex++] = (byte)(0x80 + (b >> 1));
+
     }
     
-    // Add a 0xFF at the end, to signal the tape to display
+// For WS2811
     data[dataIndex++] = (byte)255;
+
+// For LPD8806
+//    data[dataIndex++] = (byte)0;
     
     // Don't send data too fast, the arduino can't handle it.
     int maxChunkSize = 5;
@@ -65,7 +73,13 @@ class LedOutput
       byte[] test = new byte[currentChunkSize];
       
       for(int i = 0; i < currentChunkSize; i++) {
+//        if(currentChunkPos + i > m_numberOfLEDs*3) {
+//          test[i] = (byte)255;
+//        }
+//        else {
           test[i] = data[currentChunkPos + i];
+//        }
+
       }
     
       m_outPort.write(test);

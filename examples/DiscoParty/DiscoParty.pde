@@ -1,5 +1,4 @@
 import processing.opengl.*;
-
 import processing.serial.*;
 
 /**
@@ -52,17 +51,16 @@ void setup()
 {
   frameRate(30);
   size(100, 200, OPENGL);
-//  size(screen.width, screen.height, OPENGL);
-
+  
   println(this);
   minim = new Minim(this);
   audioin = minim.getLineIn(Minim.STEREO, 2048);
-
 
   // auto connect to all blinkyboards
   for(String p : Serial.list()) {
     if(p.startsWith("/dev/cu.usbmodem")) {
       leds.add(new LedOutput(this, p, numberOfLEDs));
+      delay(100);
     }
   }
 

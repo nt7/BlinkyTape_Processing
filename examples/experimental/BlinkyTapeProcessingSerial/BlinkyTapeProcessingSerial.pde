@@ -6,7 +6,7 @@ int numberOfLEDs = 60;
 ArrayList<LedOutput> leds = new ArrayList<LedOutput>();
 
 void setup() {
-  frameRate(120);
+  frameRate(60);
   size(5,60);
   
   // auto connect to all blinkyboards
