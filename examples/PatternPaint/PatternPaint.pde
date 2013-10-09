@@ -4,8 +4,10 @@ import java.awt.event.KeyEvent;
 //import processing.opengl.*;
 //import javax.media.opengl.GL;
 
+
+
 ControlP5 controlP5;
-LedOutput led = null;
+BlinkyTape bt = null;
 
 PFont myFont;
 ColorPicker cp;
@@ -47,7 +49,7 @@ void setup() {
                       
   for(String p : Serial.list()) {
     if(p.startsWith("/dev/cu.usbmodem")) {
-      led = new LedOutput(this, p, numberOfLEDs);
+      bt = new BlinkyTape(this, p, numberOfLEDs);
       break;  // TODO: does this work?
     }
   }
@@ -117,8 +119,9 @@ void draw() {
   
   drawCrosshair();
   
-  if(led != null) {
-    led.sendUpdate(buffer, pos, 0, pos, buffer.height);
+  if(bt != null) {
+    bt.render(buffer, pos, 0, pos, buffer.height);
+    bt.send();
   }
 }
 
@@ -251,13 +254,13 @@ void savePattern() {
 
 void launchProcess() {
   savePattern();
-  led.resetTape();
-  ProcessLauncher p = new ProcessLauncher(sketchPath("program.sh") + " " + led.getPortName());
+  bt.resetTape();
+  ProcessLauncher p = new ProcessLauncher(sketchPath("program.sh") + " " + bt.getPortName());
   delay(100);
   print(p.read());
   p.waitFor();
   delay(2000);
-  led = new LedOutput(this, led.getPortName(), numberOfLEDs);
+  bt = new BlinkyTape(this, bt.getPortName(), numberOfLEDs);
 }
 
 void importImage() {
