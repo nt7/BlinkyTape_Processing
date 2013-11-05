@@ -46,7 +46,15 @@ void setup()
   minim = new Minim(this);
   audioin = minim.getLineIn(Minim.STEREO, 2048);
 
-  leds.add(new LedOutput(this, "/dev/cu.usbmodemfa131", numberOfLEDs));
+
+  for(String p : Serial.list()) {
+    if(p.startsWith("/dev/cu.usbmodem")) {
+      leds.add(new LedOutput(this, p, numberOfLEDs));
+      break;  // TODO: does this work?
+    }
+  }
+// Old connection strings....
+//  leds.add(new LedOutput(this, "/dev/cu.usbmodemfa131", numberOfLEDs));
 //  leds.add(new LedOutput(this, "/dev/cu.usbmodemfd121", numberOfLEDs));
 //  leds.add(new LedOutput(this, "/dev/cu.usbmodemfa131", numberOfLEDs));
 
