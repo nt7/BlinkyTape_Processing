@@ -167,7 +167,17 @@ void setup() {
   // Open serial port.  As written here, this assumes the Arduino is the
   // first/only serial device on the system.  If that's not the case,
   // change "Serial.list()[0]" to the name of the port to be used:
-  port = new Serial(this, Serial.list()[0], 115200);
+  //port = new Serial(this, Serial.list()[0], 115200);
+  
+  // changing to similar code as in other sketches
+  // auto connect to all blinkyboards
+  for(String p : Serial.list()) {
+    if(p.startsWith("/dev/cu.usbmodem")) {
+      port = new Serial(this, p, 115200);
+      delay(100);
+    }
+  }
+  
   // Alternately, in certain situations the following line can be used
   // to detect the Arduino automatically.  But this works ONLY with SOME
   // Arduino boards and versions of Processing!  This is so convoluted
