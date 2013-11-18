@@ -27,13 +27,13 @@ FFT rightFft;
 
 BeatDetect beat;
 
-float globalVolume = 30;  // amplification value
+float globalVolume = 10;  // amplification value
 float globalFalloff = 1;  // how fast things die off
 float globalSat = 100;
 
 float colorSpeed = .05;
 
-ArrayList<LedOutput> leds = new ArrayList<LedOutput>();
+ArrayList<BlinkyTape> bts = new ArrayList<BlinkyTape>();
 
 float kickSize, snareSize, hatSize;
 
@@ -181,15 +181,16 @@ void draw()
   }
 
   // Remove disconnected tapes
-  for(int i = leds.size() - 1; i > -1; i--) {
-     if(!leds.get(i).isConnected()) {
-       leds.remove(i);
+  for(int i = bts.size() - 1; i > -1; i--) {
+     if(!bts.get(i).isConnected()) {
+       bts.remove(i);
      }
   }
   
-  for(int i = 0; i < leds.size(); i++) {
+  for(int i = 0; i < bts.size(); i++) {
     float pos = 15 + 15*i;
-    leds.get(i).sendUpdate(pos, 0, pos, height);
+    bts.get(i).render(pos, 0, pos, height);
+    bts.get(i).send();
     
     stroke(255);
     line(pos, 0, pos, height);
@@ -204,7 +205,7 @@ void draw()
   
   if(s != null && s.m_chosen) {
     s.m_chosen = false;
-    leds.add(new LedOutput(this, s.m_port, numberOfLEDs));
+    bts.add(new BlinkyTape(this, s.m_port, numberOfLEDs));
     s = null;
   }
 }
