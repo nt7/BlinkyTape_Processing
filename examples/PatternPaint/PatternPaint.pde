@@ -126,7 +126,7 @@ void draw() {
   
   if(bt != null) {
     bt.render(buffer, pos, 0, pos, buffer.height);
-    bt.send();
+    bt.update();
   }
   
   if(ss != null && ss.m_chosen) {

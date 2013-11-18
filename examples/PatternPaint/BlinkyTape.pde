@@ -103,8 +103,9 @@ class BlinkyTape
     }
     
     // Add a 0xFF at the end, to signal the tape to display
-    data[dataIndex++] = (byte)255;
+    data[dataIndex] = (byte)255;
     
+    m_dataIndex = dataIndex;
     m_data = data;
   }
   
@@ -159,7 +160,9 @@ class BlinkyTape
   
   // finalize - for use with pushPixel
   void update() {
-    m_data[m_dataIndex++] = (byte)255;
+    if( m_data[m_dataIndex] != (byte)255) {
+      m_data[m_dataIndex++] = (byte)255;
+    }
     send();
     m_dataIndex = 0;
   }

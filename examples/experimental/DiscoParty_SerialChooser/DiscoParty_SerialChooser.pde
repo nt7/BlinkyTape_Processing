@@ -190,7 +190,7 @@ void draw()
   for(int i = 0; i < bts.size(); i++) {
     float pos = 15 + 15*i;
     bts.get(i).render(pos, 0, pos, height);
-    bts.get(i).send();
+    bts.get(i).update();
     
     stroke(255);
     line(pos, 0, pos, height);
