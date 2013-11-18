@@ -23,6 +23,8 @@ int columns = 60;
 
 LineTool tool;
 
+SerialSelector ss;
+
 void setup() {
   buffer = createGraphics(numberOfLEDs, columns);
   size(windowWidthForBuffer(buffer), 380);
@@ -46,13 +48,14 @@ void setup() {
                       buffOffX, buffOffY,
                       buffScale * buffer.width,
                       buffScale * buffer.height);
-                      
-  for(String p : Serial.list()) {
-    if(p.startsWith("/dev/cu.usbmodem")) {
-      bt = new BlinkyTape(this, p, numberOfLEDs);
-      break;  // TODO: does this work?
-    }
-  }
+
+// For older-style "dirty" connections, not using serial selector.                      
+//  for(String p : Serial.list()) {
+//    if(p.startsWith("/dev/cu.usbmodem")) {
+//      bt = new BlinkyTape(this, p, numberOfLEDs);
+//      break;  // TODO: does this work?
+//    }
+//  }
 
   controlP5 = new ControlP5(this);
 
@@ -102,6 +105,8 @@ void setup() {
     .getCaptionLabel().set("Save to BlinkyTape");
     
     
+    ss = new SerialSelector();
+    
 }
 
 float pos = 0;
@@ -122,6 +127,12 @@ void draw() {
   if(bt != null) {
     bt.render(buffer, pos, 0, pos, buffer.height);
     bt.send();
+  }
+  
+  if(ss != null && ss.m_chosen) {
+    ss.m_chosen = false;
+    bt = new BlinkyTape(this, ss.m_port, numberOfLEDs);
+    ss = null;
   }
 }
 
