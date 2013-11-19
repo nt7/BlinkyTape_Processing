@@ -1,10 +1,6 @@
 import processing.serial.*;
 import controlP5.*;
 import java.awt.event.KeyEvent;
-//import processing.opengl.*;
-//import javax.media.opengl.GL;
-
-
 
 ControlP5 controlP5;
 BlinkyTape bt = null;
@@ -28,13 +24,6 @@ SerialSelector ss;
 void setup() {
   buffer = createGraphics(numberOfLEDs, columns);
   size(windowWidthForBuffer(buffer), 380);
-
-//  noSmooth();
-//  // Turn on vsync to prevent tearing
-//  PGraphicsOpenGL pgl = (PGraphicsOpenGL) g; //processing graphics object
-//  GL gl = pgl.beginGL(); //begin opengl
-//  gl.setSwapInterval(2); //set vertical sync on
-//  pgl.endGL(); //end opengl
   
   frameRate(60);
   frame.setResizable(true);
@@ -169,9 +158,6 @@ void keyPressed() {
     case KeyEvent.VK_O: // open
       importImage();
       break;
-    case KeyEvent.VK_L: // launch, for testing
-      launchProcess();
-      break;
   }
 }
 
@@ -261,17 +247,6 @@ void savePattern() {
   saver.write16bitRLE();
   saver.write16bitRLEHex();
   println("Saved to 'pov.h'");
-}
-
-void launchProcess() {
-  savePattern();
-  bt.resetTape();
-  ProcessLauncher p = new ProcessLauncher(sketchPath("program.sh") + " " + bt.getPortName());
-  delay(100);
-  print(p.read());
-  p.waitFor();
-  delay(2000);
-  bt = new BlinkyTape(this, bt.getPortName(), numberOfLEDs);
 }
 
 void importImage() {
