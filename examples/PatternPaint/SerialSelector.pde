@@ -53,7 +53,8 @@ public class SerialSelector {
       // Mask unlikely ports on OS/X
       if(s.startsWith("/dev/tty")
        | s.contains("Bluetooth-PDA-Sync")
-       | s.contains("Bluetooth-Modem")) {
+       | s.contains("Bluetooth-Modem")
+       | s.contains("Bluetooth-Incoming-Port")) {
         continue;
       }
       

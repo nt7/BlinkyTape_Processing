@@ -73,7 +73,9 @@ class BlinkyTape
   
   // Update the blinkyboard with new colors
   void render(PImage image, float x1, float y1, float x2, float y2) {
-    m_outPort.clear();
+    if(isConnected()) {
+      m_outPort.clear();
+    }
     
     image.loadPixels();
     
@@ -110,6 +112,10 @@ class BlinkyTape
   }
   
   void send() {
+    if(!isConnected()) {
+      return;
+    }
+    
     startSend();
     while(sendNextChunk()) {
       delay(1);
