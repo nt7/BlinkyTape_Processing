@@ -134,8 +134,6 @@ static final int leds[][] = new int[][] {
 };
 
 // GLOBAL VARIABLES ---- You probably won't need to modify any of this -------
-
-byte[]           serialData  = new byte[1 + (leds.length * 3)];
 short[][]        ledColor    = new short[leds.length][3],
                  prevColor   = new short[leds.length][3];
 byte[][]         gamma       = new byte[256][3];
@@ -149,9 +147,12 @@ PImage[]         preview     = new PImage[displays.length];
 Serial           port;
 DisposeHandler   dh; // For disabling LEDs on exit
 
+SerialSelector ss;
+BlinkyTape bt = null;
+
 // INITIALIZATION ------------------------------------------------------------
 
-void setup() {
+void setup() {  
   GraphicsEnvironment     ge;
   GraphicsConfiguration[] gc;
   GraphicsDevice[]        gd;
@@ -160,33 +161,6 @@ void setup() {
   float                   f, range, step, start;
 
   dh = new DisposeHandler(this); // Init DisposeHandler ASAP
-
-  // add the "set" byte to the serial data buffer.
-  serialData[serialData.length - 1] = (byte)255;
-
-  // Open serial port.  As written here, this assumes the Arduino is the
-  // first/only serial device on the system.  If that's not the case,
-  // change "Serial.list()[0]" to the name of the port to be used:
-  //port = new Serial(this, Serial.list()[0], 115200);
-  
-  // changing to similar code as in other sketches
-  // auto connect to all blinkyboards
-  for(String p : Serial.list()) {
-    if(p.startsWith("/dev/cu.usbmodem")) {
-      port = new Serial(this, p, 115200);
-      delay(100);
-    }
-  }
-  
-  // Alternately, in certain situations the following line can be used
-  // to detect the Arduino automatically.  But this works ONLY with SOME
-  // Arduino boards and versions of Processing!  This is so convoluted
-  // to explain, it's easier just to test it yourself and see whether
-  // it works...if not, leave it commented out and use the prior port-
-  // opening technique.
-  // port = openPort();
-  // And finally, to test the software alone without an Arduino connected,
-  // don't open a port...just comment out the serial lines above.
 
   // Initialize screen capture code for each display's dimensions.
   dispBounds = new Rectangle[displays.length];
@@ -263,7 +237,7 @@ void setup() {
   }
 
   // Preview window shows all screens side-by-side
-  size(totalWidth * pixelSize, maxHeight * pixelSize, JAVA2D);
+  size(totalWidth * pixelSize, maxHeight * pixelSize);
   noSmooth();
 
   // Pre-compute gamma correction table for LED brightness levels:
@@ -273,39 +247,9 @@ void setup() {
     gamma[i][1] = (byte)(f * 240.0);
     gamma[i][2] = (byte)(f * 220.0);
   }
+  
+  ss = new SerialSelector();
 }
-
-// Open and return serial connection to Arduino running LEDstream code.  This
-// attempts to open and read from each serial device on the system, until the
-// matching "Ada\n" acknowledgement string is found.  Due to the serial
-// timeout, if you have multiple serial devices/ports and the Arduino is late
-// in the list, this can take seemingly forever...so if you KNOW the Arduino
-// will always be on a specific port (e.g. "COM6"), you might want to comment
-// out most of this to bypass the checks and instead just open that port
-// directly!  (Modify last line in this method with the serial port name.)
-
-Serial openPort() {
-  String[] ports;
-  String   ack;
-  int      i, start;
-  Serial   s;
-
-  ports = Serial.list(); // List of all serial ports/devices on system.
-
-  for(i=0; i<ports.length; i++) { // For each serial port...
-    System.out.format("Trying serial port %s\n",ports[i]);
-    try {
-      s = new Serial(this, ports[i], 115200);
-      return s;
-    }
-    catch(Exception e) {
-      // Can't open port, probably in use by other software.
-      continue;
-    }
-  }
-  return null;
-}
-
 
 // PER_FRAME PROCESSING ------------------------------------------------------
 
@@ -339,9 +283,9 @@ void draw () {
   for(i=0; i<leds.length; i++) {  // For each LED...
     d = leds[i][0]; // Corresponding display index
     if(d == -1){ // pixel should be skipped
-      serialData[j++] = (byte)0;
-      serialData[j++] = (byte)0;
-      serialData[j++] = (byte)0;
+      if(bt != null) {
+        bt.pushPixel(color(0));
+      }
       continue;
     }
     if(useFullScreenCaps == true) {
@@ -395,28 +339,41 @@ void draw () {
     ledColor[i][2] = (short)min(ledColor[i][2], (short)254);
 
     // Apply gamma curve and place in serial output buffer
-    serialData[j++] = (byte)gamma[ledColor[i][0]][0];
-    serialData[j++] = (byte)gamma[ledColor[i][1]][1];
-    serialData[j++] = (byte)gamma[ledColor[i][2]][2];
+    if(bt != null) {
+      bt.pushPixel(color((byte)gamma[ledColor[i][0]][0],
+                         (byte)gamma[ledColor[i][0]][1],
+                         (byte)gamma[ledColor[i][2]][2]));
+    }
+
     // Update pixels in preview image
     preview[d].pixels[leds[i][2] * displays[d][1] + leds[i][1]] =
      (ledColor[i][0] << 16) | (ledColor[i][1] << 8) | ledColor[i][2];
   }
 
-  if(port != null) port.write(serialData); // Issue data to Arduino
-
-  // Show live preview image(s)
-  scale(pixelSize);
-  for(i=d=0; d<nDisplays; d++) {
-    preview[d].updatePixels();
-    image(preview[d], i, 0);
-    i += displays[d][1] + 1;
+  if(bt != null) {
+    bt.update();
   }
+
+  pushMatrix();
+    // Show live preview image(s)
+    scale(pixelSize);
+    for(i=d=0; d<nDisplays; d++) {
+      preview[d].updatePixels();
+      image(preview[d], i, 0);
+      i += displays[d][1] + 1;
+    }
+  popMatrix();
 
   println(frameRate); // How are we doing?
 
   // Copy LED color data to prior frame array for next pass
   arraycopy(ledColor, 0, prevColor, 0, ledColor.length);
+  
+  if(ss != null && ss.m_chosen) {
+    ss.m_chosen = false;
+    bt = new BlinkyTape(this, ss.m_port, 60);
+    ss = null;
+  }
 }
 
 
@@ -432,10 +389,13 @@ public class DisposeHandler {
     pa.registerDispose(this);
   }
   public void dispose() {
-    // Fill serialData with 0's, and issue to Arduino...
-//    Arrays.fill(serialData, 6, serialData.length, (byte)0);
-    java.util.Arrays.fill(serialData, 0, serialData.length - 2, (byte)0);
-    if(port != null) port.write(serialData);
+    if(bt != null) {
+      bt.setIndex(0);
+      for(int i = 0; i < 60; i++) {
+        bt.pushPixel(color(0));
+      }
+      bt.update();
+    } 
   }
 }
 
