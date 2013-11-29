@@ -47,6 +47,9 @@ int[] values;
 ArrayList<Pulser> leftPulsers = new ArrayList<Pulser>();
 ArrayList<Pulser> rightPulsers = new ArrayList<Pulser>();
 
+// A single Burst that everyone shares
+Burst burst;
+
 void setup()
 {
   frameRate(30);
@@ -128,6 +131,7 @@ void setup()
     rightPulsers.add(p);
   }
 
+  burst = new Burst();
 
   textFont(createFont("Helvetica", 16));
   textAlign(CENTER);
