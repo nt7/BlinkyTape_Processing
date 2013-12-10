@@ -12,7 +12,6 @@ class Pulser {
   
   int m_band;
 
-//  float m_value;
   float m_falloff;
   
   float m_h;
@@ -45,7 +44,7 @@ class Pulser {
   }
   
   void draw(FFT fft) {
-    m_scale = globalVolume;
+    m_scale = Sensitivity;
     
     m_values.add(fft.getAvg(m_band));
     
@@ -55,30 +54,29 @@ class Pulser {
     }
     value = value/m_values.size();
     
-    while(m_values.size() > 1) {
+    while(m_values.size() > Smoothing) {
       m_values.remove(0);
     }
     
-//    m_value = max(fft.getAvg(m_band), m_value);
+    // draw the particle
+    pushStyle();
+      colorMode(HSB, 100);
+
+      float hue = (m_h + sin(colorAngle)*100+50)%100;
+      float val = max(50,min(100,m_scale*value));
+      float alpha = max(0,min(100,m_scale*value));
+
+      color burstcolor = color(hue, m_s, val, alpha);
+
+      int w = (int)(m_scale*value);
+
+      burst.draw(int(m_x),int(m_y),burstcolor, w/20.0);
+    popStyle();
     
-    // Draw a fuzzy rectangle
-    noStroke();
-    colorMode(HSB, 100);
-
-    float b = max(0,min(100,m_scale*value));
-    float a = max(0,min(100,m_scale*value));
-
-    color fgcolor = color((m_h + sin(colorAngle)*100+50)%99, m_s, b, a);
-    color bgcolor = color((m_h + sin(colorAngle)*100+50)%99, m_s, b, 0);
-
-    int w = (int)(m_scale*value + m_size);
-
-    drawFuzzyRectangle((int)(m_x-w/2),(int)( m_y-w/2), w, w, w, fgcolor, bgcolor);
-    stroke(1);
-    
+    // Move the particle forward in space
     m_x = (m_x + m_xv);
     m_y = (m_y + m_yv);
-    
+  
     if(m_x > maxWidth) {
       m_x = 0;
       m_y = random(0,height);
@@ -87,7 +85,7 @@ class Pulser {
       m_x = maxWidth;
       m_y = random(0,height);
     }
-    
+  
     if(m_y > height) {
       m_y = 0;
       m_x = random(0,maxWidth);
@@ -96,33 +94,5 @@ class Pulser {
       m_y = height;
       m_x = random(0,maxWidth);
     }
-
-    
-//    m_value = m_value*m_falloff;
-    
-    colorMode(RGB, 256);
   }
-  
-//  void draw(float kickSize) {
-//    // Draw a fuzzy rectangle
-//    noStroke();
-//
-//    float bright = (kickSize -15)/8;
-//    color fgcolor = color((sin(col             )+1)*128, 
-//                          (sin(col + 3.14159*2/3)+1)*128, 
-//                          (sin(col + 3.14159*4/3)+1)*128, 
-//                          255);
-////    color bgcolor = color(0,0);
-//    color bgcolor = color((sin(col              )+1)*128, 
-//                          (sin(col + 3.14159*2/3)+1)*128, 
-//                          (sin(col + 3.14159*4/3)+1)*128, 
-//                          0);
-//
-//    int w = (int)(m_size*bright);
-//    drawFuzzyRectangle((int)(m_x-w/2),(int)( m_y-w/2), w, w, w, fgcolor, bgcolor);
-//    stroke(1);
-//    
-//    m_x = (m_x + m_xv + maxWidth)%maxWidth;
-//    m_y = (m_y + m_yv + height)%height;
-//  }
 }
