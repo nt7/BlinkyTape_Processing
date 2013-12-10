@@ -3,7 +3,7 @@ public class SerialSelector {
   public String m_port;
 
   PFont m_font;
-  int m_fontSize = 25;
+  int m_fontSize = 15;
   float m_fontHeight;
   float m_fontAscent;
   
