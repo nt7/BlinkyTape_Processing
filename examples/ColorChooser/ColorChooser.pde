@@ -1,7 +1,7 @@
 import controlP5.*;
 import processing.serial.*;
 
-ArrayList<LedOutput> leds = new ArrayList<LedOutput>();
+ArrayList<BlinkyTape> leds = new ArrayList<BlinkyTape>();
 
 ControlP5 controlP5;
 ColorPicker cp;
@@ -18,7 +18,7 @@ void setup()
   // auto connect to all blinkyboards
   for(String p : Serial.list()) {
     if(p.startsWith("/dev/cu.usbmodem")) {
-      leds.add(new LedOutput(this, p, numberOfLEDs));
+      leds.add(new BlinkyTape(this, p, numberOfLEDs));
     }
   }
 }
@@ -32,7 +32,8 @@ void draw()
   cp.render();
 
   for(int i = 0; i < leds.size(); i++) {
-    leds.get(i).sendUpdate(20, 235, 100, 235);
+    leds.get(i).render(20, 235, 100, 235);
+    leds.get(i).send();
   }
 }
 

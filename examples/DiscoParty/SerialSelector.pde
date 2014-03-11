@@ -47,21 +47,39 @@ public class SerialSelector {
 
   // Filter out some ports we don't care about
   String[] listPorts() {
-    ArrayList<String> ports = new ArrayList<String>();
-    
-    for(String s : Serial.list()) {
-      // Mask unlikely ports
-      if(s.startsWith("/dev/cu")
-       | s.contains("Bluetooth-PDA-Sync")
-       | s.contains("Bluetooth-Modem")) {
-        continue;
-      }
-      
-      ports.add(s);
-    }
-    
-    return ports.toArray(new String[0]);
-  }
+     ArrayList<String> ports = new ArrayList<String>();
+     String OS = System.getProperty("os.name");
+     
+     if(OS.startsWith("Mac OS X")) {
+       for(String s : Serial.list()) {
+         // Mask unlikely ports on OS/X
+         if(s.startsWith("/dev/tty")
+          | s.contains("Bluetooth-PDA-Sync")
+          | s.contains("Bluetooth-Modem")
+          | s.contains("Bluetooth-Incoming-Port")) {
+           continue;
+         }
+         
+         ports.add(s);
+       }
+     }
+     else if(OS.startsWith("Linux")) {
+       for(String s : Serial.list()) {
+         // Mask unlikely ports on OS/X
+         if(s.startsWith("/dev/ttyACM")) {
+          ports.add(s);
+         }
+       }
+     }
+     else {
+       // Other OS
+       for(String s : Serial.list()) {        
+         ports.add(s);
+       }
+     }
+  
+     return ports.toArray(new String[0]);
+   }
 
   void draw() {
     // If we haven't selected a serial port, draw a menu to display the possible choices
