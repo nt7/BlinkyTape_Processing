@@ -65,7 +65,7 @@ public class SerialSelector {
      }
      else if(OS.startsWith("Linux")) {
        for(String s : Serial.list()) {
-         // Mask unlikely ports on OS/X
+         // Mask unlikely ports on Linux
          if(s.startsWith("/dev/ttyACM")) {
           ports.add(s);
          }
