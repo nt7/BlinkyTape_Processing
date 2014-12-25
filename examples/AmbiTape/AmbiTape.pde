@@ -43,7 +43,7 @@ import processing.serial.*;
 // at all times, regardless of screen content.  Higher values are brighter,
 // or set to 0 to disable this feature.
 
-static final short minBrightness = 120;
+static final short minBrightness = 0;
 
 // LED transition speed; it's sometimes distracting if LEDs instantaneously
 // track screen contents (such as during bright flashing sequences), so this
@@ -85,7 +85,7 @@ static final boolean useFullScreenCaps = true;
 // For example, '9,6' = 9 LEDs across, 6 LEDs down.
 
 static final int displays[][] = new int[][] {
-   {0,26,20} // Screen 0, 26 LEDs across, 17 LEDs down
+   {0,34,13} // Screen 0, 34 LEDs across, 13 LEDs down
 //,{1,9,6} // Screen 1, also 9 LEDs across and 6 LEDs down
 };
 
@@ -105,7 +105,7 @@ static final int displays[][] = new int[][] {
 
 static final int leds[][] = new int[][] {
   // Left Side
-  {0,0,17}, {0,0,16}, {0,0,15}, {0,0,14}, {0,0,13}, {0,0,12},
+  {0,0,13}, {0,0,12},
   {0,0,11}, {0,0,10}, {0,0, 9}, {0,0, 8}, {0,0, 7}, {0,0, 6},
   {0,0, 5}, {0,0, 4}, {0,0, 3}, {0,0, 2}, {0,0, 1},
 
@@ -114,12 +114,12 @@ static final int leds[][] = new int[][] {
   {0, 6,1}, {0, 7,1}, {0, 8,1}, {0, 9,1}, {0,10,1}, {0,11,1},
   {0,12,1}, {0,13,1}, {0,14,1}, {0,15,1}, {0,16,1}, {0,17,1},
   {0,18,1}, {0,19,1}, {0,20,1}, {0,21,1}, {0,22,1}, {0,23,1},
-  {0,24,1}, {-1,25,1},
+  {0,24,1}, {0,25,1}, {0,26,1}, {0,27,1}, {0,28,1}, {0,29,1}, {0,30,1}, {0,31,1}, {0,32,1}, {0,33,1}, {-1,34,1},
 
   // Right Side
   {0,25, 1}, {0,25, 2}, {0,25, 3}, {0,25, 4}, {0,25, 5}, {0,25, 6},
   {0,25, 7}, {0,25, 8}, {0,25, 9}, {0,25,10}, {0,25,11}, {0,25,12},
-  {0,25,13}, {0,25,14}, {0,25,15}, {0,25,16}, {0,25,17}
+  {0,25,13}
 
 /* Hypothetical second display has the same arrangement as the first.
    But you might not want both displays completely ringed with LEDs;
